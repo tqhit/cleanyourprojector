@@ -1,0 +1,58 @@
+# KAW K670 projector (board t950s_be311 / ro.jm.board.name=W5, Amlogic T950S txhd2, "Smart project")
+# Android 13 (API 33, armeabi-v7a), userdebug, SELinux disabled, root adbd. Spoofed fingerprint google/redfin.
+# RAM: 1 GB physical (/proc/meminfo is patched to report 2 GB). Panel 1280x720 @ 30 Hz.
+# Stock Home: com.master.t972 behind com.jm.jmlauncher (see devices/kaw-k670/README.md).
+#
+# Apply:  tools/disable.sh <ip> devices/kaw-k670/debloat.txt
+# Undo:   tools/restore.sh <ip> devices/kaw-k670/debloat.txt
+# Tested 2026-10-21 on one unit, with screenshots between batches and after reboots.
+#
+# KEEP (the projector needs these): com.softwinner.tcorrection (keystone/autofocus), com.htc.htcsettings
+# (projector settings: Projection, Developer Options), com.jm.jmlauncher (Home router - disabling it leaves
+# no Home), com.droidlogic.* (inputs, Live TV, remote keyboard), com.fb (JMFactory, LED receiver - never
+# open it), com.define.shellservice, com.android.providers.contacts (shares a uid with the remote
+# keyboard), Play Store / Play Services, YouTube, Netflix.
+# com.master.t972 is disabled by tools/install-launcher.sh, not here: it is the only Home until then.
+
+# --- Adware / ads / tracking ---
+com.smart.tv.launcher                            # silently installed by the ttyunos C2 chain from apk.v8ying.com; com.cy.adplayer AdServices, SensorsData
+com.android.adservices.api                       # Privacy Sandbox ad services
+com.android.ondevicepersonalization.services     # on-device ad personalization
+com.google.android.tvrecommendations             # ads.AdsSignalsContentProvider, notification listener
+
+# --- Stores and casting: OPTIONAL, comment out what you use (AirPlay, Miracast, USB display) ---
+com.master.tv.market                             # vendor store, xapk installer, boot receiver
+com.dinhlap.dlstore                              # 3rd-party store with WRITE_SECURE_SETTINGS
+com.waxrain.airplaydmr2                          # AirPlay receiver, 10 open ports
+com.droidlogic.miracast
+com.bozee.usbdisplay                             # USB display, runs as system uid, 11 open ports (com.huawei.connection process)
+
+# --- Streaming, browser, voice: OPTIONAL, comment out what you use ---
+com.amazon.amazonvideo.livingroom
+vn.vtv.vtvgotv
+com.mxtech.videoplayer.ad
+com.android.chrome
+com.google.android.katniss                       # voice assistant
+
+# --- Phone-style bloat ---
+com.google.android.leanbacklauncher              # unused second launcher
+com.google.android.atv.widget
+com.google.android.landscape
+com.android.printspooler
+com.android.musicfx
+com.android.providers.calendar
+com.google.android.syncadapters.calendar
+com.google.android.syncadapters.contacts
+com.android.wallpaperbackup
+com.android.camera2
+com.android.deskclock
+com.android.gallery3d
+com.android.dynsystem
+com.android.hotspot2.osulogin
+# com.android.providers.contacts                 # kept: shares uid 10024 with com.droidlogic.inputmethod.remote
+
+# --- Backdoor return paths (tools/harden.sh disables these too) ---
+com.droidlogic.updater                           # OTA (aats.amlogic.com) could restore the backdoor
+com.koushikdutta.superuser                       # su grant UI for jmsu su-daemon
+# com.master.accessibility                       # remote mouse ("NetflixMouse", ~78 MB RSS). The phone Netflix app
+#                                                # cannot be driven by D-pad without it: disable only if you skip Netflix.
