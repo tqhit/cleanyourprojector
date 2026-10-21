@@ -14,12 +14,17 @@ and uninstall competing apps. It also reports 2 GB of RAM while having 1 GB. Det
 
 | Tool | |
 |---|---|
-| `tools/scan.sh <ip>` | **Read-only** report: backdoor indicators, spoofed RAM, root ADB, SELinux, adware, silent installers, LAN listeners, uncompiled apps |
+| `tools/scan.sh <ip>` | **Read-only** report for any Android projector: root code started by init, download-and-run scripts, overlay-injected files, spoofed RAM, root/open ADB, SELinux, silent installers, known indicators, per-app LAN listeners and connections, uncompiled apps |
+| `tools/backup.sh <ip>` | save packages, properties, settings and Home locally before changing anything |
+| `tools/inventory.sh <ip>` | classify every package (keep / bloat / review / optional, with permissions, RAM, leanback, Home) to write a list for a new model |
 | `tools/disable.sh <ip> <list>` | `pm disable-user` every package in a device list |
 | `tools/restore.sh <ip> <list>` | re-enable them, undo Private DNS, give Home back to the stock launcher |
-| `tools/harden.sh <ip>` | close the JM backdoor and every route back (init scripts, su daemon, OTA, USB auto-install, C2 hosts/IP), re-applied on each boot; originals quarantined |
+| `tools/harden.sh <ip> [--dns adguard]` | disable malicious packages on any device; on JM firmware also close the backdoor and every route back, re-applied on each boot |
 | `tools/optimize.sh <ip>` | fewer cached processes, faster animations, AOT-compile the apps the projector never compiled |
-| `tools/install-launcher.sh <ip> devices/<model>` | build and install the [cleanyourtv](https://github.com/Gathin23/cleanyourtv) Apple-TV-style launcher with a per-device config, including JM's `HOME.JM` routing |
+| `tools/install-launcher.sh <ip> devices/<model>` | build and install the [cleanyourtv](https://github.com/Gathin23/cleanyourtv) Apple-TV-style launcher with a per-device config, including vendor Home routers |
+
+Indicators (packages, domains, IPs, files, properties, init lines) live in [data/indicators.tsv](data/indicators.tsv), so
+adding a new firmware family is a data change.
 
 ## Quick start
 
@@ -31,8 +36,9 @@ cd cleanyourprojector
 tools/scan.sh 192.168.1.50
 ```
 
-Read the report, then follow `devices/<model>/README.md`, or paste [PROMPT.md](PROMPT.md) into Claude Code and let it walk
-through your unit. Needs `adb`; the launcher build also needs JDK 17 and the Android SDK (platform 34).
+The easy way: paste [PROMPT.md](PROMPT.md) into Claude Code from this folder and let it walk through your unit, model by
+model, the way cleanyourtv does for TVs. By hand: read the scan, then follow `devices/<model>/README.md`, or for a model not
+listed yet `tools/inventory.sh` and `devices/_template/`. Needs `adb`; the launcher build also needs JDK 17 and the Android SDK (platform 34).
 
 **When you are done, switch USB debugging off.** On JM firmware ADB is root and needs no confirmation, so anyone on your
 network who reaches port 5555 owns the projector.
@@ -43,7 +49,9 @@ network who reaches port 5555 owns the projector.
 |---|---|---|
 | [KAW K670](devices/kaw-k670/) | JM, Amlogic T950S, Android 13 | backdoor, 1 GB RAM reported as 2 GB, Home via `com.jm.jmlauncher` |
 
-Add yours: copy a device folder, keep it free of personal data (serial, MAC, Wi-Fi name, account names), open a PR.
+Add yours: copy `devices/_template`, keep it free of personal data (serial, MAC, Wi-Fi name, account names), open a PR.
+
+Problems: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 ## Limits
 

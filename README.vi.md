@@ -12,12 +12,17 @@ Máy còn báo khống RAM 2 GB trong khi thực tế chỉ có 1 GB. Chi tiết
 
 | Lệnh | |
 |---|---|
-| `tools/scan.sh <ip>` | Quét **chỉ đọc**: dấu hiệu backdoor, RAM báo khống, ADB root, SELinux, adware, app cài ngầm, cổng mở trong LAN, app chưa biên dịch |
+| `tools/scan.sh <ip>` | Quét **chỉ đọc** cho mọi máy chiếu Android: code root do init chạy, script tự tải và chạy, file chèn qua overlay, RAM báo khống, ADB root/mở, SELinux, app cài ngầm, chỉ dấu đã biết, cổng mở và kết nối theo từng app, app chưa biên dịch |
+| `tools/backup.sh <ip>` | Sao lưu package, prop, settings, Home trước khi thay đổi |
+| `tools/inventory.sh <ip>` | Phân loại mọi package (giữ / rác / xem xét / tuỳ chọn, kèm quyền, RAM, leanback, Home) để lập danh sách cho máy mới |
 | `tools/disable.sh <ip> <list>` | Tắt (`pm disable-user`) các app trong danh sách của máy |
 | `tools/restore.sh <ip> <list>` | Bật lại tất cả, trả DNS và launcher gốc |
-| `tools/harden.sh <ip>` | Chặn backdoor JM và mọi đường quay lại (init script, su-daemon, OTA, tự cài từ USB, domain/IP C2), tự áp lại mỗi lần khởi động; file gốc được cách ly |
+| `tools/harden.sh <ip> [--dns adguard]` | Tắt app độc hại trên mọi máy; với firmware JM còn chặn backdoor và mọi đường quay lại, tự áp lại mỗi lần khởi động |
 | `tools/optimize.sh <ip>` | Giảm tiến trình nền, hiệu ứng nhanh hơn, biên dịch AOT các app chưa từng được biên dịch |
-| `tools/install-launcher.sh <ip> devices/<model>` | Build và cài launcher kiểu Apple TV của [cleanyourtv](https://github.com/Gathin23/cleanyourtv) với cấu hình riêng cho từng máy |
+| `tools/install-launcher.sh <ip> devices/<model>` | Build và cài launcher kiểu Apple TV của [cleanyourtv](https://github.com/Gathin23/cleanyourtv) với cấu hình riêng cho từng máy, xử lý được bộ định tuyến Home của hãng |
+
+Các chỉ dấu (package, domain, IP, file, prop, dòng init) nằm trong [data/indicators.tsv](data/indicators.tsv): thêm một dòng
+firmware mới chỉ là thêm dữ liệu.
 
 ## Bắt đầu nhanh
 
@@ -30,7 +35,9 @@ cd cleanyourprojector
 tools/scan.sh 192.168.1.50
 ```
 
-Đọc kết quả quét, rồi làm theo `devices/<model>/README.md`. Hoặc dán [PROMPT.md](PROMPT.md) vào Claude Code để AI làm cùng bạn.
+Cách dễ nhất: mở Claude Code trong thư mục này và dán [PROMPT.md](PROMPT.md), AI sẽ làm từng bước trên máy của bạn, giống
+cleanyourtv làm với TV. Làm tay: đọc kết quả quét rồi theo `devices/<model>/README.md`; với máy chưa có trong danh sách thì
+dùng `tools/inventory.sh` và `devices/_template/`. Gặp lỗi: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 **Làm xong thì tắt USB debugging.** Trên firmware JM, ADB chạy quyền root và không cần xác nhận, nên ai trong mạng nhà bạn
 kết nối được tới cổng 5555 cũng chiếm toàn quyền máy chiếu.

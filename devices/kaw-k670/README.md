@@ -14,7 +14,7 @@
 ```sh
 tools/scan.sh <ip>                                         # read-only report
 tools/disable.sh <ip> devices/kaw-k670/debloat.txt         # edit the OPTIONAL sections first
-tools/harden.sh <ip>                                       # close the backdoor, reboot, scan again
+tools/harden.sh <ip> --dns adguard                         # close the backdoor, reboot, scan again
 tools/optimize.sh <ip>
 tools/install-launcher.sh <ip> devices/kaw-k670            # optional, replaces com.master.t972
 ```
