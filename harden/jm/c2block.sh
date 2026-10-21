@@ -1,8 +1,10 @@
 #!/system/bin/sh
 # Runs as root on every boot (see /system/etc/init/c2block.rc).
-for ip in 123.207.77.74; do
+# IPs from data/indicators.tsv, written by tools/harden.sh.
+while read -r ip; do
+    [ -n "$ip" ] || continue
     iptables -C OUTPUT -d "$ip" -j REJECT 2>/dev/null || iptables -I OUTPUT -d "$ip" -j REJECT
-done
+done < /system/etc/cyp-block-ips
 # Keep the /data hooks harmless even if something recreates them.
 for f in /data/ttyunos/ttyunos.sh /data/ttyunos/v9ying.sh /data/ttyunos/custom.sh /data/local/agent.sh; do
     mkdir -p "$(dirname "$f")"

@@ -64,8 +64,8 @@ prefs, downloads `.jar` plugins (`pcam.jar`, `app_pccache`); connected to 101.33
 ## What `tools/harden.sh` does
 
 Overlay overrides in `/mnt/scratch/overlay/system/upper` (the same mechanism the vendor used):
-`ttyunos.rc` and `root_access.rc` emptied; `/system/etc/{ttyunos,v9ying,custom}.sh`, `bin/upgrade.sh`, `bin/installxapk.sh`
-replaced by stubs; `/system/etc/hosts` blocks the domains; `c2block.rc` runs `c2block.sh` on every boot (iptables REJECT for the
+`ttyunos.rc` and `root_access.rc` emptied (sources in `harden/jm/`); `/system/etc/{ttyunos,v9ying,custom}.sh`, `bin/upgrade.sh`, `bin/installxapk.sh`
+replaced by stubs; `/system/etc/hosts` blocks the domains of `data/indicators.tsv`; `c2block.rc` runs `c2block.sh` on every boot (iptables REJECT for its
 IP, stubs back into `/data/ttyunos` and `/data/local/agent.sh` as root 755, `/data/install-*.sh` removed, the two URL properties
 cleared, the stock launcher re-disabled when ours is installed). Disables `com.droidlogic.updater` and
 `com.koushikdutta.superuser`. Moves the pushed `jmsu` and the downloaded scripts to `/data/local/quarantine`.
