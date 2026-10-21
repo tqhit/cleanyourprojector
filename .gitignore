@@ -1,0 +1,7 @@
+# Device backups hold the serial number, MAC address and settings: never commit them.
+backup/
+shots/
+build/
+*.apk
+local.properties
+.DS_Store
