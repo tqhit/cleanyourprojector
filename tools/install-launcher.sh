@@ -4,8 +4,9 @@
 # persist.sys.home.selectpkg instead of the normal HOME default.
 # Usage: tools/install-launcher.sh <ip[:port]> devices/<model>
 set -eu
-cd "$(dirname "$0")/.."
-. tools/_adb.sh "$1"
+cd "$(dirname "$0")/.." || exit 1
+# shellcheck source=tools/_adb.sh
+. tools/_adb.sh "${1:-}"
 DEVDIR="${2:?usage: tools/install-launcher.sh <ip> devices/<model>}"
 [ -f "$DEVDIR/config.xml" ] || { echo "$DEVDIR/config.xml missing" >&2; exit 1; }
 [ -f upstream/cleanyourtv/launcher/gradlew ] || git submodule update --init

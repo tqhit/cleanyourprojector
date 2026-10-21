@@ -2,8 +2,9 @@
 # Speed-ups for 1 GB projectors. All reversible (see the end of this file).
 # Usage: tools/optimize.sh <ip[:port]>
 set -u
-cd "$(dirname "$0")/.."
-. tools/_adb.sh "$1"
+cd "$(dirname "$0")/.." || exit 1
+# shellcheck source=tools/_adb.sh
+. tools/_adb.sh "${1:-}"
 S 'settings put global window_animation_scale 0.5; settings put global transition_animation_scale 0.5; settings put global animator_duration_scale 0.5'
 # Default keeps 32 cached processes, far more than ~650 MB of usable RAM holds without swapping.
 S 'device_config set_sync_disabled_for_tests persistent; device_config put activity_manager max_cached_processes 12'
@@ -17,6 +18,6 @@ for p in com.gathin.tvhome com.google.android.youtube.tv com.netflix.mediaclient
   printf '%-40s speed-profile: ' "$p"; S cmd package compile -m speed-profile -f "$p" | tail -1
 done
 S sm fstrim
-echo done
+echo "optimized"
 # Undo: animation scales back to 1.0; device_config delete activity_manager max_cached_processes;
 # cmd package compile --reset <package>.
