@@ -1,0 +1,38 @@
+# Known-bad indicators read by tools/scan.sh and tools/harden.sh. One per line, tab-separated:
+#   type      value                                   severity  family  note
+# type:     package | domain | ip | path | prop | rc
+#           (rc = text that, inside /system|/vendor|/odm/etc/init/*.rc, marks a known-bad service)
+# severity: bad (malicious or a root/remote channel) | warn (tracking, silent installer, risky)
+# Add what you find on your unit and open a PR; keep the note short and factual.
+package	com.smart.tv.launcher	bad	jm	ad player (com.cy.adplayer), SensorsData analytics, downloads .jar plugins; pushed by the JM C2
+package	com.master.t972	warn	jm	stock Home; silently installs APKs from txy.jiumaoos.com as uid system
+package	com.master.tv.market	warn	jm	vendor store, xapk installer, boot receiver
+package	com.dinhlap.dlstore	warn	-	third-party store with WRITE_SECURE_SETTINGS and INSTALL_PACKAGES
+package	com.koushikdutta.superuser	warn	-	root grant UI for an su daemon
+package	com.droidlogic.updater	warn	amlogic	OTA client; on JM firmware an OTA restores the backdoor
+package	com.waxrain.airplaydmr2	warn	-	AirPlay receiver, opens ~10 LAN ports
+package	com.bozee.usbdisplay	warn	-	USB display, runs as uid system, opens ~11 LAN ports
+package	com.google.android.tvrecommendations	warn	-	ads signals provider and notification listener
+package	com.android.adservices.api	warn	-	Privacy Sandbox ad services
+package	com.android.ondevicepersonalization.services	warn	-	on-device ad personalization
+domain	jm.v7ying.com	bad	jm	serves install-host.sh run as root
+domain	apk.v8ying.com	bad	jm	C2 base URL, adware APKs, jmsu autoload payload
+domain	jm.v9ying.com	bad	jm	serves install-recovery-v9-curl.sh run as root
+domain	v7ying.com	bad	jm	JM C2 apex
+domain	v8ying.com	bad	jm	JM C2 apex
+domain	v9ying.com	bad	jm	JM C2 apex
+domain	txy.jiumaoos.com	warn	jm	launcher silent installer, keystone app telemetry
+domain	jiumaoos.com	warn	jm	JM vendor apex
+domain	appreg.clapvf.com	warn	jm	device registration from the keystone app
+domain	clapvf.com	warn	jm	telemetry apex
+domain	aats.amlogic.com	warn	amlogic	OTA server
+ip	123.207.77.74	bad	jm	C2 for install-recovery.sh (plain HTTP, runs returned scripts as root)
+path	/data/install-recovery.sh	bad	jm	C2 client downloaded at boot
+path	/data/install-host.sh	bad	jm	sets the C2 URL
+path	/data/install-end.sh	bad	jm	extra script fetched from the C2 and run as root
+path	/data/local/install/script.log	warn	jm	C2 job log
+path	/mnt/scratch/overlay/system/upper/bin/jmsu	bad	jm	su daemon with remote autoload pushed into /system
+prop	persist.sys.jm.url	bad	jm	C2 base URL
+prop	persist.sys.proxy.url	bad	jm	jmsu autoload URL
+rc	start ttyunos	bad	jm	ttyunos.rc: runs /data/ttyunos/*.sh as root on network up
+rc	/data/local/agent.sh	warn	jm	preinstall.rc: runs a /data script as root on boot
