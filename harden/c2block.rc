@@ -1,0 +1,10 @@
+# 2026-10-21: block hard-coded C2 IP and keep backdoor hooks neutralized on every boot.
+on property:sys.boot_completed=1
+    start c2block
+
+service c2block /system/bin/sh /system/etc/c2block.sh
+    disabled
+    oneshot
+    user root
+    group root
+    seclabel u:r:shell:s0

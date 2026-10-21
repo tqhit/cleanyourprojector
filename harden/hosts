@@ -1,0 +1,19 @@
+127.0.0.1       localhost
+::1             ip6-localhost
+# 2026-10-21: block JM firmware C2 / telemetry / OTA
+0.0.0.0 v7ying.com
+0.0.0.0 jm.v7ying.com
+0.0.0.0 www.v7ying.com
+0.0.0.0 v8ying.com
+0.0.0.0 apk.v8ying.com
+0.0.0.0 jm.v8ying.com
+0.0.0.0 www.v8ying.com
+0.0.0.0 v9ying.com
+0.0.0.0 jm.v9ying.com
+0.0.0.0 www.v9ying.com
+0.0.0.0 jiumaoos.com
+0.0.0.0 txy.jiumaoos.com
+0.0.0.0 www.jiumaoos.com
+0.0.0.0 clapvf.com
+0.0.0.0 appreg.clapvf.com
+0.0.0.0 aats.amlogic.com
