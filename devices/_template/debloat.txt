@@ -1,0 +1,15 @@
+# <Brand Model> (<board>, Android <version>)
+# Apply:  tools/disable.sh <ip> devices/<model>/debloat.txt
+# Undo:   tools/restore.sh <ip> devices/<model>/debloat.txt
+# Tested <date>: <what was checked after applying>.
+#
+# KEEP: <keystone/autofocus app>, <projector settings app>, <Home and anything that routes Home>,
+# <inputs / Live TV>, <remote keyboard, Bluetooth>, Play Store / Play Services.
+
+# --- Adware / tracking ---
+
+# --- Vendor stores and silent installers ---
+
+# --- Phone-style bloat ---
+
+# --- OPTIONAL: comment out what you use ---
