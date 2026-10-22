@@ -41,6 +41,23 @@ tools/install-launcher.sh <ip> devices/kaw-k670            # optional, replaces 
 - Do not use *Other Setting → Reset Setting*: a factory reset wipes `/mnt/scratch` and brings the backdoor back. If you must,
   keep it off Wi-Fi until `tools/harden.sh` has run again.
 
+## Reported on a sibling unit (#2), not yet checked on the K670
+
+Same board (`t950s_be311`, `W5`), sold unbranded as "HD & AI Projector, 65W". From @doz10us's audit:
+
+- **Hardware:** Wi-Fi/BT SeekWave SV6160LITE on USB (`3607:6621`); accelerometer MSA321; USB-Ethernet drivers built in
+  (RTL8152, AX88179), so a USB-Ethernet adapter should work as wired LAN (untested); Widevine likely L3; no USB device
+  mode, so network ADB is the only way in. Kernel is 32-bit ARM with SELinux left out.
+- **Keystone without the vendor app:** `setprop persist.vendor.hwc.keystone "x1 y1 x2 y2 x3 y3 x4 y4"`, the four corners in
+  1920×1080 space, applied live by the vendor HWC. `com.softwinner.tcorrection` also does sensor-based auto keystone, so keep it.
+- **Focus motor:** write `2,1` / `1,1` to `/sys/devices/platform/motor0/motor_ctrl` to drive it, `0,1` to stop; end stops at
+  `motor_limiter` and `motor_limiter1`.
+- **Remote:** F+ / F− send Linux key codes 636 / 635 and the mouse button 637, mapped in the vendor `.kl` to non-standard
+  labels (`MOTOR_FR`, `MOTOR_FF`, `MOUSE`).
+- **Calibration and keys** in `/mnt/vendor/factory` (`AutoFocus/`, `HDCP_RX14_KEY`, `avb_persist`) are world-writable (0777).
+  `tools/scan.sh` reports it; don't chmod them blindly, the projector's own services write there.
+- **Do not wipe from the stock recovery** and do not expect a GSI to boot: see [TROUBLESHOOTING](../../docs/TROUBLESHOOTING.md#hardening).
+
 ## Measured (one unit)
 
 | | before | after |

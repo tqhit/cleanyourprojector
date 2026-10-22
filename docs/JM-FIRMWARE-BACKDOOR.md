@@ -1,7 +1,9 @@
 # JM firmware backdoor (Amlogic T950S projectors)
 
-Found on a KAW K670 (`ro.jm.board.name=W5`, Android 13 userdebug) on 2026-10-21. The same firmware family ("JM", domains
-`jiumaoos.com` and `v7/v8/v9ying.com`) ships on other budget projectors; `tools/scan.sh` checks for every indicator below.
+Found on a KAW K670 (`ro.jm.board.name=W5`, Android 13 userdebug) on 2026-10-21, and confirmed on a second unit in #2
+(unbranded "HD & AI Projector, 65W", same board, build `be311-13 TQ-2A.20251028`): same chain, same C2, same 1 GB of RAM
+reported as 2 GB. The firmware family ("JM", domains `jiumaoos.com` and `v7/v8/v9ying.com`) ships on other budget
+projectors; `tools/scan.sh` checks for every indicator below.
 
 **Summary.** On every network connection the firmware downloads shell scripts over plain HTTP and runs them as root. The
 server registers the device (serial, MAC, model, country), hands out jobs, and has used them to install adware, push a
@@ -59,6 +61,7 @@ prefs, downloads `.jar` plugins (`pcam.jar`, `app_pccache`); connected to 101.33
 | Properties | `sys.jm.ttyunos`, `persist.sys.jm.url`, `persist.sys.proxy.url`, `persist.sys.jm.count`, `persist.sys.jm.active.date` |
 | `jmsu` (autoload) | 1 023 860 bytes, MD5 `1a7487d267cfab22d6f2e8119da3734b` |
 | `jmsu` (factory) | 391 532 bytes, MD5 `d2f0a6bd4f92243b80338ea333a75b00` |
+| `jmsu` disguised as an APK (#2) | `/data/local/com.master.jmsu_1765528691.apk` (job 2025-12-12): an ARM ELF, 23 251 bytes, truncated download of the autoload `jmsu` (its section headers point past the end, at 1 023 780), MD5 `fbb9e57b649ebd8e698b1581f450f178`, SHA-256 `e106b460ae7ee2c8dfea16044219775468583f594c787c2ea76c744c2dcda4e3` |
 | Packages | `com.smart.tv.launcher` (adware), `com.master.t972` and `com.master.tv.market` (silent installers) |
 
 ## What `tools/harden.sh` does
@@ -69,6 +72,11 @@ replaced by stubs; `/system/etc/hosts` blocks the domains of `data/indicators.ts
 IP, stubs back into `/data/ttyunos` and `/data/local/agent.sh` as root 755, `/data/install-*.sh` removed, the two URL properties
 cleared, the stock launcher re-disabled when ours is installed). Disables `com.droidlogic.updater` and
 `com.koushikdutta.superuser`. Moves the pushed `jmsu` and the downloaded scripts to `/data/local/quarantine`.
+
+**No SELinux to fall back on.** `getenforce` says `Disabled` because SELinux is not compiled into the kernel
+(`CONFIG_LSM` without `selinux`, no `/sys/fs/selinux`); the vendor also removed SELinux calls from `init`,
+`servicemanager`, `hwservicemanager`, `apexd`, `installd`, `vold_prepare_subdirs`, `libandroid_runtime.so` and `libfs_mgr*`
+(#2). Every root service runs unconfined, and calibration files under `/mnt/vendor/factory` are world-writable.
 
 **Not fixable without reflashing:** the `ConnectivityService` trigger (harmless once nothing answers it), and a factory
 reset, which wipes `/mnt/scratch` and restores everything. The only complete mitigation is keeping the projector off the
