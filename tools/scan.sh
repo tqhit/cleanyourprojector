@@ -63,12 +63,29 @@ section "Remote access"
 PORT=$(Q getprop service.adb.tcp.port)
 [ -n "$PORT" ] && [ "$PORT" != 0 ] && [ "$PORT" != -1 ] && warn "ADB listens on the network (port $PORT): switch debugging off when done"
 SEL=$(Q getenforce)
-case "$SEL" in Enforcing) ok "SELinux enforcing" ;; *) bad "SELinux is ${SEL:-unknown}: root services run unconfined" ;; esac
+case "$SEL" in
+  Enforcing) ok "SELinux enforcing" ;;
+  Permissive) bad "SELinux permissive: policy loaded but not enforced, root services run unconfined" ;;
+  *) if [ -z "$(Q ls -d /sys/fs/selinux)" ]; then
+       bad "no SELinux at all (${SEL:-unknown}, no /sys/fs/selinux): left out of the kernel, root services run unconfined"
+     else bad "SELinux is ${SEL:-unknown}: root services run unconfined"; fi ;;
+esac
 for su in /system/xbin/su /system/bin/su /sbin/su /system/xbin/daemonsu; do
   [ -n "$(Q ls $su)" ] && warn "su binary present: $su"
 done
 DAEMONS=$(Q "ps -A -o NAME" | grep -E -x 'jmsu|daemonsu|su|magiskd|supolicy' | sort -u | tr '\n' ' ')
 [ -n "$DAEMONS" ] && warn "root daemons running: $DAEMONS"
+
+section "Factory data"
+# Factory calibration (autofocus, keystone) and keys. World-writable files here can be overwritten by any app; report
+# only, since the projector's own calibration services write to these folders.
+WW=$(Q "find /mnt/vendor/factory /mnt/vendor/param -maxdepth 3 -type f -perm -0002 2>/dev/null")
+if [ -n "$WW" ]; then
+  warn "world-writable factory/calibration files ($(printf '%s\n' "$WW" | wc -l | tr -d ' ')); don't chmod blindly, the keystone app writes here:"
+  printf '%s\n' "$WW" | head -8 | sed 's/^/           /'
+elif [ -n "$(Q ls -d /mnt/vendor/factory)" ]; then ok "no world-writable files in /mnt/vendor/factory or /mnt/vendor/param"
+elif [ $ROOT = 0 ] && [ -z "$(Q ls -d /mnt/vendor/factory)" ]; then skip "factory partition permissions"
+fi
 
 section "Root code launched by init"
 # Any init service whose program lives on /data runs code that was not part of the signed image, as whatever user
@@ -117,8 +134,8 @@ EOF
 if [ $ROOT = 1 ]; then
   while IFS=$'\t' read -r val sev note; do
     [ -n "$val" ] || continue
-    [ -n "$(Q ls "$val")" ] || continue
-    FOUND=1; [ "$sev" = bad ] && bad "$val — $note" || warn "$val — $note"
+    M=$(Q ls -d "$val" | tr '\n' ' '); [ -n "$M" ] || continue
+    FOUND=1; [ "$sev" = bad ] && bad "${M% } — $note" || warn "${M% } — $note"
   done <<EOF
 $(indicators path)
 EOF
