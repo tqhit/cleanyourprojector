@@ -41,6 +41,14 @@
 
 - **`tools/harden.sh` says no overlay**: JM firmware ships with `/mnt/scratch` already set up by the vendor's own
   `adb remount`. Elsewhere, `adb root && adb remount` may create it, but on locked bootloaders it fails: block at the router.
+- **Never wipe from the stock recovery on T950S/JM units.** A second unit's recovery mounts the `factory` partition
+  (`mmcblk0p4`, autofocus/keystone calibration and keys) as `/sdcard` while looking for update packages, so a wipe there
+  may take the calibration with it. Reported in #2, deliberately not tested.
+- **`skipping malformed recovery.lk line: back_door` in the recovery log is harmless**: it is recovery's own remote key map
+  (`/sbin/recovery.kl`), not the firmware backdoor (#2).
+- **Generic system images (GSI) do not boot on JM T950S firmware.** SELinux is left out of the kernel and the vendor stripped
+  SELinux calls from `init`, `servicemanager` and others, so a standard system image aborts early (#2). This repo cleans
+  the stock system instead of replacing it.
 - **After a factory reset the backdoor is back**: the overlay is wiped. Keep the projector off Wi-Fi, enable debugging,
   run `tools/harden.sh`, reboot, `tools/scan.sh`, then reconnect.
 
