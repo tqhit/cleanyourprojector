@@ -63,6 +63,7 @@ mkdir -p $Q/overlay $Q/data $Q/ttyunos; chmod 700 $Q
 if [ -f $U/bin/jmsu ]; then mv $U/bin/jmsu $Q/overlay/jmsu; fi
 if [ -f /data/local/jmsu ]; then mv /data/local/jmsu $Q/data/jmsu.datacopy; fi
 if [ -f /data/local/root_access.rc ]; then mv /data/local/root_access.rc $Q/data/; fi
+for f in /data/local/com.master.jmsu_*.apk; do if [ -f "$f" ]; then mv "$f" $Q/data/; fi; done
 for f in /data/install-host.sh /data/install-recovery.sh /data/install-end.sh /data/install-recovery-v9.sh; do
   if [ -f $f ]; then mv $f $Q/data/; fi
 done

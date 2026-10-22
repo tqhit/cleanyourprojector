@@ -1,6 +1,6 @@
 # Known-bad indicators read by tools/scan.sh and tools/harden.sh. One per line, tab-separated:
 #   type      value                                   severity  family  note
-# type:     package | domain | ip | path | prop | rc
+# type:     package | domain | ip | path | prop | rc   (a path may contain * globs)
 #           (rc = text that, inside /system|/vendor|/odm/etc/init/*.rc, marks a known-bad service)
 # severity: bad (malicious or a root/remote channel) | warn (tracking, silent installer, risky)
 # Add what you find on your unit and open a PR; keep the note short and factual.
@@ -32,6 +32,7 @@ path	/data/install-host.sh	bad	jm	sets the C2 URL
 path	/data/install-end.sh	bad	jm	extra script fetched from the C2 and run as root
 path	/data/local/install/script.log	warn	jm	C2 job log
 path	/mnt/scratch/overlay/system/upper/bin/jmsu	bad	jm	su daemon with remote autoload pushed into /system
+path	/data/local/com.master.jmsu_*.apk	bad	jm	jmsu (su daemon with autoload) disguised as an .apk, an ELF left by a C2 job; seen truncated (#2)
 prop	persist.sys.jm.url	bad	jm	C2 base URL
 prop	persist.sys.proxy.url	bad	jm	jmsu autoload URL
 rc	start ttyunos	bad	jm	ttyunos.rc: runs /data/ttyunos/*.sh as root on network up
