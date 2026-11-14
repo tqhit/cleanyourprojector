@@ -10,7 +10,12 @@ The tools apply them to a fresh copy at build time. The submodules themselves ar
 
 `tools/install-launcher.sh` applies every `patches/launcher/*.patch` in name order with `patch -p1` (paths relative to
 `launcher/`). If a patch no longer applies, for example after a submodule update, the install stops and names it.
-With no patches the launcher builds exactly as upstream ships it.
+Two patches may touch the same file. A later patch's hunks then land at an offset, which is fine as long as the context
+still matches. With no patches the launcher builds exactly as upstream ships it.
+
+If a patch declares `<uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />`, the install grants it with
+`pm grant` (only adb can). Some TV Settings screens refuse apps without it. It also lets the launcher change any secure or
+global setting, so declare it only when a patch needs it.
 
 ## Making a patch
 

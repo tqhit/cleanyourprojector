@@ -71,7 +71,14 @@ What happened:
 - **Buttons the Google TV launcher answered** are brought back by `config.xml`: the gear is Linux `KEY_F19` (scancode 189,
   `settings_key_scancodes`), YouTube is `BUTTON_3` (190), and the **Live TV** button is `KEYCODE_FEATURED_APP_1` (297, Google's "Free TV"
   key). It is not `KEYCODE_GUIDE`. In `getevent` it shows as `KEY_GRAPHICSEDITOR` (429), but a `scan:429` entry
-  does not fire.
+  does not fire. The gear opens the launcher's quick settings panel (`settings_key_panel`), the closest thing to the Google TV
+  launcher's panel; set it to `false` for TV Settings instead.
+- **Bluetooth settings cannot be opened the usual way.** `Settings.ACTION_BLUETOOTH_SETTINGS` has no handler on this firmware.
+  Remotes & Accessories (paired devices, Connect) opens only through TV Settings' slice screen:
+  `android.settings.SLICE_SETTINGS` with the extra `slice_uri=content://com.android.tv.settings.accessories.sliceprovider/general`.
+  TV Settings starts that screen only for callers holding `WRITE_SECURE_SETTINGS`. `adb shell am start` works because the shell
+  holds it. An app without it is refused with a `SecurityException`. On this unit, a local patch added a Bluetooth row to the
+  panel by declaring the permission, which `tools/install-launcher.sh` then grants.
 - **Remapping on the TV**: the Google TV launcher's "Remote buttons" screen and hold-to-change go away with it. The stock
   clean launcher has no on-TV remap: edit `app_keys` and reinstall, or add the feature as a personal launcher patch
   (see [`patches/`](../../patches/)). On this unit, a local patch added both back (Launcher settings → Remote buttons, or hold a
