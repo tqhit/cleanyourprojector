@@ -1,0 +1,51 @@
+# Wanbo Vali 1 Pro (SDMC firmware, MediaTek MT5896 hw mt5896 / board merak, device "coorg")
+# Android 14 (API 34), user build, release-keys, SELinux enforcing, non-root adbd. Google TV certified.
+#
+# Apply:  tools/disable.sh <ip> devices/wanbo-vali1-pro/debloat.txt
+# Undo:   tools/restore.sh <ip> devices/wanbo-vali1-pro/debloat.txt
+#
+# KEEP: com.mediatek.trapezoidapp (keystone), com.sdmc.projectsettings (projector settings), com.sdmc.service
+# (projector service manager), com.google.android.apps.tv.launcherx (Home), com.mediatek.tv.launcher.partner,
+# com.google.android.tv.inputplayer / com.mediatek.tis (inputs), com.google.android.tv.remote.service,
+# com.android.providers.contacts (shares a uid with userdictionary), Play Store / Play Services.
+# Never open com.sdmc.sdmcfactory, com.sdmc.test.servicemanagertest, mediatek.factorymenu.ui (left enabled).
+
+# --- Adware / tracking ---
+com.android.adservices.api                       # Privacy Sandbox ad services
+com.android.ondevicepersonalization.services     # on-device ad personalization
+com.android.federatedcompute.services            # federated learning for ad personalization
+com.google.android.feedback                      # crash/feedback reports, reads logs
+com.android.tv.feedbackconsent
+
+# --- Vendor stores and silent installers ---
+com.mediatek.tv.retaildemo                       # store demo mode
+# com.android.devicelockcontroller               # Device Lock (financed devices): Android 14 refuses, "protected package"
+
+# --- Phone-style bloat ---
+com.google.android.partnersetup
+com.android.cameraextensions
+com.android.health.connect.backuprestore
+com.android.healthconnect.controller
+com.android.nearby.halfsheet
+com.android.providers.calendar
+com.google.android.syncadapters.calendar
+com.android.wallpaperbackup
+com.android.dynsystem
+com.android.hotspot2.osulogin
+
+# --- Only with the clean launcher (tools/install-launcher.sh disables com.google.android.apps.tv.launcherx) ---
+# setupwraith answers HOME at priority 1 (.RecoveryActivity) and would take Home once launcherx is off.
+# It also owns Wi-Fi networks saved during first setup: forget and rejoin Wi-Fi in Settings before disabling
+# it, or the networks are deleted (check: dumpsys wifi | grep -o 'cname=[^ ]*'). Re-enable before a factory reset.
+com.google.android.tungsten.setupwraith
+
+# --- OPTIONAL: comment out what you use ---
+com.google.android.marvin.talkback               # screen reader
+com.google.android.youtube.tvmusic
+com.google.android.play.games
+# com.google.android.apps.mediashell             # Chromecast
+# com.google.android.katniss                     # Assistant / voice search
+# com.mediatek.miracast                          # screen mirroring
+# com.google.android.apps.tv.dreamx              # Ambient mode screensaver
+# com.google.android.tts                         # text-to-speech (TalkBack, Assistant replies)
+# com.mediatek.tv.systemupdater                  # OTA: brings security patches on this certified build

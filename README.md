@@ -48,6 +48,7 @@ network who reaches port 5555 owns the projector.
 | Device | Firmware | Notes |
 |---|---|---|
 | [KAW K670](devices/kaw-k670/) | JM, Amlogic T950S, Android 13 | backdoor, 1 GB RAM reported as 2 GB, Home via `com.jm.jmlauncher` |
+| [Wanbo Vali 1 Pro](devices/wanbo-vali1-pro/) | SDMC, MediaTek MT5896, Google TV 14 | clean firmware, setupwraith owns Home and first-setup Wi-Fi |
 
 Add yours: copy `devices/_template`, keep it free of personal data (serial, MAC, Wi-Fi name, account names), open a PR.
 

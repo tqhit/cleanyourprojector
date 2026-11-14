@@ -27,6 +27,13 @@ echo "stock launcher: ${STOCK:-unknown}"
 BUILD=build/launcher
 rm -rf "$BUILD"; mkdir -p build; cp -R upstream/cleanyourtv/launcher "$BUILD"
 cp "$DEVDIR/config.xml" "$BUILD/app/src/main/res/values/config.xml"
+# Personal launcher patches (git-ignored, see patches/README.md), applied in name order.
+for p in patches/launcher/*.patch; do
+  [ -f "$p" ] || continue
+  # No .orig backups: macOS patch writes one whenever a hunk lands at an offset (two patches touching one
+  # file), and Gradle rejects any non-.xml file under res/values.
+  patch -s --no-backup-if-mismatch -p1 -d "$BUILD" < "$p" || { echo "$p no longer applies to upstream/cleanyourtv: update it" >&2; exit 1; }
+done
 if [ -z "${JAVA_HOME:-}" ]; then
   for j in /opt/homebrew/opt/openjdk@17 /usr/local/opt/openjdk@17 "$(/usr/libexec/java_home -v 17 2>/dev/null || true)"; do
     [ -x "$j/bin/java" ] && JAVA_HOME=$j && break
@@ -45,6 +52,12 @@ adb -s "$DEV" push "$APK" /data/local/tmp/tvhome.apk >/dev/null
 OUT=$(S 'pm install -r /data/local/tmp/tvhome.apk; rm -f /data/local/tmp/tvhome.apk')
 echo "$OUT"; case "$OUT" in *Success*) ;; *) echo "install failed; stock launcher untouched" >&2; exit 1 ;; esac
 S cmd package compile -m speed -f com.gathin.tvhome >/dev/null
+# A personal patch may declare WRITE_SECURE_SETTINGS (for example to open a TV Settings screen guarded by it);
+# only adb can grant it. Match the declaration: upstream's manifest already names the permission on ThemeProvider.
+if grep -q '<uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"' "$BUILD/app/src/main/AndroidManifest.xml"; then
+  GRANT=$(S pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS)
+  [ -z "$GRANT" ] || echo "could not grant WRITE_SECURE_SETTINGS: $GRANT" >&2
+fi
 
 # Apps without a leanback entry (phone Netflix, vendor settings) go in through the launcher's library file.
 if [ -f "$DEVDIR/library_apps.txt" ]; then
