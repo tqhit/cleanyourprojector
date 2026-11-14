@@ -27,6 +27,11 @@ echo "stock launcher: ${STOCK:-unknown}"
 BUILD=build/launcher
 rm -rf "$BUILD"; mkdir -p build; cp -R upstream/cleanyourtv/launcher "$BUILD"
 cp "$DEVDIR/config.xml" "$BUILD/app/src/main/res/values/config.xml"
+# Personal launcher patches (git-ignored, see patches/README.md), applied in name order.
+for p in patches/launcher/*.patch; do
+  [ -f "$p" ] || continue
+  patch -s -p1 -d "$BUILD" < "$p" || { echo "$p no longer applies to upstream/cleanyourtv: update it" >&2; exit 1; }
+done
 if [ -z "${JAVA_HOME:-}" ]; then
   for j in /opt/homebrew/opt/openjdk@17 /usr/local/opt/openjdk@17 "$(/usr/libexec/java_home -v 17 2>/dev/null || true)"; do
     [ -x "$j/bin/java" ] && JAVA_HOME=$j && break
